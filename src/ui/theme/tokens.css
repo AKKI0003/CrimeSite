@@ -1,0 +1,9 @@
+/* Design tokens - Dev A owns this file. Placeholder starting values only. */
+:root {
+  --color-bg: #0a0a0a;
+  --color-paper: #e8e2d0;
+  --color-accent-red: #8b1a1a;
+  --color-ink: #1a1a1a;
+  --font-typewriter: "Courier New", monospace;
+  --font-interface: system-ui, sans-serif;
+}

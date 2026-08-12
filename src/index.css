@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "./ui/theme/tokens.css";
+@import "./ui/theme/effects.css";
+
+body {
+  background-color: var(--color-bg);
+  font-family: var(--font-interface);
+}
