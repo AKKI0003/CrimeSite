@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Suspect } from "@/types";
 import { SuspectAvatar } from "./SuspectAvatar";
 import { TypewriterText } from "@/ui/shared/TypewriterText";
 import { useCaseState } from "@/hooks/useCaseState";
 import { playStamp } from "@/engine/audio";
+import { matchQuestion, resolveAskOutcome } from "@/engine/interrogationEngine";
 
 interface InterrogationModalProps {
   suspect: Suspect;
@@ -25,35 +26,34 @@ const PRESSURE_TO_BREAK = 10;
 /**
  * Full-screen "interrogation." Two ways to get something real out of a
  * suspect, not just clicking through a script:
- *   1. Ask about a topic — a quick, typed-out line.
+ *   1. Ask about anything, in your own words — no topic list to click
+ *      through (see engine/interrogationEngine). Typing something that
+ *      doesn't land yet, or asking about a topic you can't back up, does
+ *      NOT move the pressure meter — only presenting real evidence does.
  *   2. Present evidence — pull a piece of discovered evidence out of your
  *      case file and confront them with it directly. Specific evidence gets
  *      a specific reaction; anything else gets a generic brush-off.
- * Both raise a "pressure" meter. Once it fills, they crack — a longer,
- * more honest breakthrough line replaces the script entirely.
+ * Once pressure fills, they crack — a longer, more honest breakthrough line
+ * replaces the script entirely.
  */
 export function InterrogationModal({ suspect, onClose }: InterrogationModalProps) {
   const { isDiscovered, discoveredClues } = useCaseState();
   const [mode, setMode] = useState<"ask" | "present">("ask");
   const [activeLine, setActiveLine] = useState<{ id: string; text: string; tone?: string } | null>(null);
   const [typing, setTyping] = useState(false);
-  const [askedTopicIds, setAskedTopicIds] = useState<string[]>([]);
+  const [question, setQuestion] = useState("");
+  const [askedCount, setAskedCount] = useState(0);
   const [presentedClueIds, setPresentedClueIds] = useState<string[]>([]);
   const [pressure, setPressure] = useState(0);
   const [broken, setBroken] = useState(false);
   const [justStamped, setJustStamped] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const topics = suspect.interrogationTopics ?? [];
   const evidenceReactions = suspect.evidenceReactions ?? [];
-
-  const availableTopics = useMemo(
-    () => topics.filter((t) => !t.unlocksAfterClueId || isDiscovered(t.unlocksAfterClueId)),
-    [topics, isDiscovered]
-  );
-
   const pressurePct = Math.min(100, Math.round((pressure / PRESSURE_TO_BREAK) * 100));
 
   function bumpPressure(amount: number) {
+    if (amount <= 0) return;
     setPressure((cur) => {
       const next = cur + amount;
       if (next >= PRESSURE_TO_BREAK && !broken && suspect.breakthroughResponse) {
@@ -72,16 +72,22 @@ export function InterrogationModal({ suspect, onClose }: InterrogationModalProps
     });
   }
 
-  function askAbout(topicId: string) {
-    if (broken) return;
-    const topic = topics.find((t) => t.id === topicId);
-    if (!topic) return;
-    setActiveLine({ id: topic.id, text: topic.response, tone: topic.tone });
+  function submitQuestion(e: React.FormEvent) {
+    e.preventDefault();
+    if (broken || typing) return;
+    const q = question.trim();
+    if (!q) return;
+
+    // Free text only — matchQuestion does the keyword scoring, this
+    // component just renders whatever it decides. Asking a question never
+    // moves the pressure meter, whether it lands or not: only presenting
+    // evidence does (see NOTE-for-Dev-A point 2).
+    const outcome = matchQuestion(q, suspect, isDiscovered);
+    const resolved = resolveAskOutcome(outcome, suspect);
+    setActiveLine({ id: `ask_${askedCount}`, text: resolved.text, tone: resolved.tone });
     setTyping(true);
-    if (!askedTopicIds.includes(topicId)) {
-      setAskedTopicIds((cur) => [...cur, topicId]);
-      bumpPressure(1);
-    }
+    setAskedCount((n) => n + 1);
+    setQuestion("");
   }
 
   function presentEvidence(clueId: string) {
@@ -138,7 +144,8 @@ export function InterrogationModal({ suspect, onClose }: InterrogationModalProps
             </p>
           </div>
 
-          {/* Pressure meter — the game-y bit. Fills as you ask/confront, cracks them at max. */}
+          {/* Pressure meter — the game-y bit. Fills only from presenting
+              evidence, cracks them at max. */}
           <div className="w-20 shrink-0 sm:w-28">
             <p className="mb-1 text-right font-[var(--font-typewriter)] text-[9px] uppercase tracking-wide text-[var(--color-ink-faded)]">
               {broken ? "Cracked" : "Composure"}
@@ -206,7 +213,7 @@ export function InterrogationModal({ suspect, onClose }: InterrogationModalProps
         ) : (
           <div className="border-t border-black/10 px-4 py-3 sm:px-6">
             <div className="mb-2 flex gap-2">
-              <ModeTab active={mode === "ask"} onClick={() => setMode("ask")} label="Ask About" />
+              <ModeTab active={mode === "ask"} onClick={() => setMode("ask")} label="Ask" />
               <ModeTab
                 active={mode === "present"}
                 onClick={() => setMode("present")}
@@ -215,29 +222,23 @@ export function InterrogationModal({ suspect, onClose }: InterrogationModalProps
             </div>
 
             {mode === "ask" && (
-              <div className="flex flex-wrap gap-2">
-                {availableTopics.length === 0 && (
-                  <p className="font-[var(--font-typewriter)] text-[11px] text-[var(--color-ink-faded)]">
-                    No leads yet — discover evidence on the board to unlock questions.
-                  </p>
-                )}
-                {availableTopics.map((t) => (
-                  <button
-                    key={t.id}
-                    disabled={typing}
-                    onClick={() => askAbout(t.id)}
-                    className={`rounded-sm border px-3 py-1.5 font-[var(--font-typewriter)] text-[11px] transition-colors disabled:opacity-40 ${
-                      activeLine?.id === t.id
-                        ? "border-[var(--color-accent-red)] bg-[var(--color-accent-red)]/10 text-[var(--color-ink)]"
-                        : askedTopicIds.includes(t.id)
-                        ? "border-black/10 text-[var(--color-ink-faded)]"
-                        : "border-black/20 text-[var(--color-ink)] hover:border-[var(--color-accent-red)]"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
+              <form onSubmit={submitQuestion} className="flex gap-2">
+                <input
+                  ref={inputRef}
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  disabled={typing}
+                  placeholder="Type your question and hit enter…"
+                  className="min-w-0 flex-1 rounded-sm border border-black/20 bg-white/40 px-3 py-2 font-[var(--font-typewriter)] text-[13px] text-[var(--color-ink)] placeholder:text-[var(--color-ink-faded)] focus:border-[var(--color-accent-red)] focus:outline-none disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={typing || !question.trim()}
+                  className="rounded-sm bg-[var(--color-accent-red)] px-4 py-2 font-[var(--font-typewriter)] text-[11px] uppercase tracking-wide text-[var(--color-paper)] transition-opacity disabled:opacity-40"
+                >
+                  Ask
+                </button>
+              </form>
             )}
 
             {mode === "present" && (
@@ -271,7 +272,7 @@ export function InterrogationModal({ suspect, onClose }: InterrogationModalProps
             )}
 
             <p className="mt-2 font-[var(--font-typewriter)] text-[10px] text-[var(--color-ink-faded)]">
-              {askedTopicIds.length}/{topics.length} topics · {presentedClueIds.length} pieces of
+              {askedCount} question{askedCount === 1 ? "" : "s"} asked · {presentedClueIds.length} pieces of
               evidence presented
             </p>
           </div>

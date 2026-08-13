@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type WheelEvent } from "react";
 import type { MotionValue } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCaseState } from "@/hooks/useCaseState";
 import { useContradictions } from "@/hooks/useContradictions";
-import { useUnlockLeads } from "@/hooks/useUnlockLeads";
+import { useBoardLeads } from "@/hooks/useBoardLeads";
 import { EvidenceCard } from "@/ui/board/EvidenceCard";
+import { GhostCard } from "@/ui/board/GhostCard";
 import { BoardControls } from "@/ui/board/BoardControls";
 import { ConnectionLine } from "@/ui/board/ConnectionLine";
 import { EvidenceInspector } from "@/ui/evidence-detail/EvidenceInspector";
-import { playConnectionThud } from "@/engine/audio";
+import { playConnectionThud, playStamp } from "@/engine/audio";
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 1.75;
@@ -25,14 +27,19 @@ const MAX_ZOOM = 1.75;
 // but is applied the same way (via the transform effect below) rather than
 // re-rendering the card list.
 export function EvidenceBoard() {
-  const { discoveredClues, allSuspects, boardPositions, connections, moveCard, addConnection, removeConnection, discoverClue } =
+  const { discoveredClues, allClues, allSuspects, boardPositions, connections, moveCard, addConnection, removeConnection } =
     useCaseState();
-  const { activeContradictions } = useContradictions();
+  // NOTE: discoverClue is intentionally not called from anywhere in this file
+  // anymore — see NOTE-for-Dev-B.md #1. Reachable-but-undiscovered clues are
+  // only revealed once Dev B wires an activity-completion event to call it;
+  // that's not something the board should be triggering on a click/hold.
+  const { activeContradictions, hasFoundKeyContradiction } = useContradictions();
+  const boardLeads = useBoardLeads();
+  const wasContradictionFound = useRef(hasFoundKeyContradiction);
 
   const [zoom, setZoom] = useState(1);
   const [search, setSearch] = useState("");
   const [openClueId, setOpenClueId] = useState<string | null>(null);
-  const unlockLeads = useUnlockLeads(openClueId);
   const [pendingConnectId, setPendingConnectId] = useState<string | null>(null);
   // Off by default: these are the case file's own answer-key relationships,
   // not something the player has discovered. See BoardControls for why.
@@ -165,6 +172,15 @@ export function EvidenceBoard() {
   // link/unlink them: if a player-made connection already exists between
   // that pair, this tap removes it; otherwise it creates one. Tapping the
   // same card again, or the empty board, cancels without changing anything.
+  //
+  // Connection *type* is no longer always "related_to" — if the pair the
+  // player just linked is a real `contradicts` relationship in the case
+  // data (activeContradictions, from Dev B's contradictionEngine), the
+  // connection is tagged "contradicts" so ConnectionLine renders it in the
+  // distinct red/dashed style instead of looking identical to any other
+  // connection. That's also what makes hasFoundKeyContradiction below go
+  // true — previously nothing in the UI ever read that flag, so drawing a
+  // connection had literally no effect beyond a cosmetic line.
   const handleCardSelect = useCallback(
     (id: string) => {
       setPendingConnectId((cur) => {
@@ -176,9 +192,14 @@ export function EvidenceBoard() {
         if (existing) {
           removeConnection(existing.id);
         } else {
-          addConnection(cur, id, "related_to");
+          const isContradiction = activeContradictions.some(
+            (f) =>
+              (f.clueIdA === cur && f.clueIdB === id) || (f.clueIdA === id && f.clueIdB === cur)
+          );
+          addConnection(cur, id, isContradiction ? "contradicts" : "related_to");
           try {
-            playConnectionThud();
+            if (isContradiction) playStamp();
+            else playConnectionThud();
           } catch {
             /* audio not available yet — non-critical, ignore */
           }
@@ -186,8 +207,20 @@ export function EvidenceBoard() {
         return null;
       });
     },
-    [connections, addConnection, removeConnection]
+    [connections, activeContradictions, addConnection, removeConnection]
   );
+
+  // One-time "you got it" toast the moment a genuine contradiction gets
+  // connected (not just discovered) — this is the actual payoff for using
+  // the connect feature at all, previously missing entirely.
+  const [foundToast, setFoundToast] = useState(false);
+  useEffect(() => {
+    if (hasFoundKeyContradiction && !wasContradictionFound.current) {
+      setFoundToast(true);
+      window.setTimeout(() => setFoundToast(false), 2600);
+    }
+    wasContradictionFound.current = hasFoundKeyContradiction;
+  }, [hasFoundKeyContradiction]);
 
   return (
     <div className="fx-corkboard relative h-full w-full overflow-hidden">
@@ -207,6 +240,19 @@ export function EvidenceBoard() {
           Select a second card to connect/disconnect — or tap the board to cancel
         </div>
       )}
+
+      <AnimatePresence>
+        {foundToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="absolute left-1/2 top-2 z-30 -translate-x-1/2 rounded-[var(--radius-panel)] border border-[var(--color-accent-red-bright)] bg-black/85 px-4 py-1.5 font-[var(--font-typewriter)] text-[11px] uppercase tracking-wide text-[var(--color-accent-red-bright)] sm:top-3"
+          >
+            Contradiction connected — you found it
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div
         className="absolute inset-0 cursor-grab touch-none active:cursor-grabbing"
@@ -252,6 +298,19 @@ export function EvidenceBoard() {
               />
             );
           })}
+
+          {/* Quiet "something's here" indicators — see useBoardLeads and
+              NOTE-for-Dev-B.md: these no longer reveal on click/hold, they're
+              purely presence. Real discovery now has to route through
+              finishing an activity elsewhere (once that's wired). */}
+          {boardLeads.map((lead) => {
+            const leadClue = allClues.find((c) => c.id === lead.clueId);
+            if (!leadClue) return null;
+            const pos = leadClue.boardPosition ?? { x: 60, y: 60 };
+            return (
+              <GhostCard key={lead.clueId} x={pos.x} y={pos.y} state={lead.state} missing={lead.missing} />
+            );
+          })}
         </div>
       </div>
 
@@ -264,9 +323,8 @@ export function EvidenceBoard() {
       <EvidenceInspector
         clue={discoveredClues.find((c) => c.id === openClueId) ?? null}
         suspects={allSuspects}
+        allClues={allClues}
         onClose={() => setOpenClueId(null)}
-        unlockLeads={unlockLeads}
-        onDigDeeper={(id) => discoverClue(id)}
       />
     </div>
   );

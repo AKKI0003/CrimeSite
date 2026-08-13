@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Clue, Suspect } from "@/types";
+import { AudioCallActivity } from "@/ui/evidence-detail/AudioCallActivity";
+import { DocumentCompareActivity } from "@/ui/evidence-detail/DocumentCompareActivity";
+import { PhotoExamineActivity } from "@/ui/evidence-detail/PhotoExamineActivity";
 
 const CATEGORY_ICON: Record<Clue["category"], string> = {
   physical: "/assets/icons/physical.png",
@@ -20,16 +23,25 @@ const IMPORTANCE_VAR: Record<Clue["importance"], string> = {
 interface EvidenceInspectorProps {
   clue: Clue | null;
   suspects: Suspect[];
+  allClues: Clue[];
   onClose: () => void;
-  /** locked clues that are now reachable because of this clue — renders a
-   *  "Dig Deeper" prompt instead of unlocking them silently. See useUnlockLeads. */
-  unlockLeads?: Clue[];
-  onDigDeeper?: (clueId: string) => void;
 }
 
 // Day 2: full-text detail view for a clue, opened via EvidenceCard's
-// onDoubleClick. Previously a no-op — this is the first real destination.
-export function EvidenceInspector({ clue, suspects, onClose, unlockLeads = [], onDigDeeper }: EvidenceInspectorProps) {
+// onDoubleClick.
+//
+// v2 (per NOTE-for-Dev-A): a clue is either `read` (paragraph, same as
+// before) or one of three activities the player has to actually DO —
+// listen to a call, compare two documents, examine a photo — instead of
+// reading a conclusion. This component's only job for those three is to
+// pick the right one and hand it the clue; the actual interaction lives in
+// its own file per activity kind.
+//
+// Also per the note: `relationships` is gone from here (spoils the corkboard
+// deduction) and there's no more "Dig Deeper" button — new leads now surface
+// as a quiet pulsing card on the board itself (see useBoardLeads /
+// EvidenceBoard), not a CTA inside this modal.
+export function EvidenceInspector({ clue, suspects, allClues, onClose }: EvidenceInspectorProps) {
   useEffect(() => {
     if (!clue) return;
     function onKey(e: KeyboardEvent) {
@@ -45,6 +57,8 @@ export function EvidenceInspector({ clue, suspects, onClose, unlockLeads = [], o
         .filter((n): n is string => Boolean(n))
     : [];
 
+  const activityKind = clue?.activity?.kind ?? "read";
+
   return (
     <AnimatePresence>
       {clue && (
@@ -56,7 +70,7 @@ export function EvidenceInspector({ clue, suspects, onClose, unlockLeads = [], o
           onClick={onClose}
         >
           <motion.div
-            className="fx-paper relative max-h-[85%] w-full max-w-md overflow-y-auto rounded-[var(--radius-panel)] p-5"
+            className="fx-paper relative max-h-[85%] w-full max-w-lg overflow-y-auto rounded-[var(--radius-panel)] p-5"
             initial={{ opacity: 0, scale: 0.94, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 4 }}
@@ -95,9 +109,25 @@ export function EvidenceInspector({ clue, suspects, onClose, unlockLeads = [], o
               {clue.title}
             </h3>
 
-            <p className="mt-3 whitespace-pre-line font-[var(--font-typewriter)] text-[13px] leading-relaxed text-[var(--color-ink)]">
+            <p className="mt-2 font-[var(--font-typewriter)] text-[12px] italic leading-relaxed text-[var(--color-ink-faded)]">
               {clue.description}
             </p>
+
+            <div className="mt-3">
+              {activityKind === "audio_call" && clue.activity?.kind === "audio_call" && (
+                <AudioCallActivity activity={clue.activity} />
+              )}
+              {activityKind === "document_compare" && clue.activity?.kind === "document_compare" && (
+                <DocumentCompareActivity
+                  clue={clue}
+                  activity={clue.activity}
+                  compareClue={allClues.find((c) => c.id === clue.activity!.compareAgainstClueId)}
+                />
+              )}
+              {activityKind === "photo_examine" && clue.activity?.kind === "photo_examine" && (
+                <PhotoExamineActivity activity={clue.activity} />
+              )}
+            </div>
 
             {relatedNames.length > 0 && (
               <div className="mt-4 border-t border-black/10 pt-3">
@@ -107,45 +137,6 @@ export function EvidenceInspector({ clue, suspects, onClose, unlockLeads = [], o
                 <p className="mt-1 font-[var(--font-typewriter)] text-[12px] text-[var(--color-ink)]">
                   {relatedNames.join(", ")}
                 </p>
-              </div>
-            )}
-
-            {clue.relationships.length > 0 && (
-              <div className="mt-3 border-t border-black/10 pt-3">
-                <p className="font-[var(--font-typewriter)] text-[10px] uppercase tracking-wide text-[var(--color-ink-faded)]">
-                  Known relationships
-                </p>
-                <ul className="mt-1 space-y-0.5 font-[var(--font-typewriter)] text-[12px] text-[var(--color-ink)]">
-                  {clue.relationships.map((r, i) => (
-                    <li key={i}>
-                      <span className="text-[var(--color-accent-red)]">{r.type.replace(/_/g, " ")}</span>{" "}
-                      → {r.target}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {unlockLeads.length > 0 && (
-              <div className="mt-4 border-t border-dashed border-[var(--color-accent-amber)]/50 pt-3">
-                <p className="font-[var(--font-typewriter)] text-[10px] uppercase tracking-wide text-[var(--color-accent-amber)]">
-                  Something else might be connected here
-                </p>
-                <div className="mt-2 space-y-2">
-                  {unlockLeads.map((lead) => (
-                    <button
-                      key={lead.id}
-                      onClick={() => onDigDeeper?.(lead.id)}
-                      className="w-full rounded-sm border border-[var(--color-accent-amber)]/60 bg-[var(--color-accent-amber)]/10 px-3 py-2 text-left transition-colors hover:bg-[var(--color-accent-amber)]/20"
-                    >
-                      <p className="font-[var(--font-typewriter)] text-[11px] uppercase tracking-wide text-[var(--color-accent-amber)]">
-                        Dig Deeper
-                      </p>
-                      <p className="mt-0.5 font-[var(--font-display)] text-[13px] font-semibold text-[var(--color-ink)]">
-                        {lead.title}
-                      </p>
-                    </button>
-                  ))}
-                </div>
               </div>
             )}
           </motion.div>
