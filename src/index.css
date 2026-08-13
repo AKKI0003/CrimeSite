@@ -1,9 +1,9 @@
+@import "./ui/theme/tokens.css";
+@import "./ui/theme/effects.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "./ui/theme/tokens.css";
-@import "./ui/theme/effects.css";
 
 body {
   background-color: var(--color-bg);

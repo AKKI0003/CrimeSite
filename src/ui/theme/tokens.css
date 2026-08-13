@@ -1,9 +1,50 @@
-/* Design tokens - Dev A owns this file. Placeholder starting values only. */
+/* Design tokens — Dev A owns this file. */
 :root {
-  --color-bg: #0a0a0a;
-  --color-paper: #e8e2d0;
-  --color-accent-red: #8b1a1a;
-  --color-ink: #1a1a1a;
-  --font-typewriter: "Courier New", monospace;
-  --font-interface: system-ui, sans-serif;
+  /* Base surfaces */
+  --color-bg: #0c0b09;
+  --color-bg-raised: #15130f;
+  --color-bg-panel: #1a1712;
+  --color-border: #2e2a22;
+  --color-border-strong: #443d2f;
+
+  /* Corkboard / paper */
+  --color-paper: #e8e0c8;
+  --color-paper-dark: #d9cfab;
+  --color-ink: #201c14;
+  --color-ink-faded: #4a4436;
+
+  /* Accent */
+  --color-accent-red: #9c2b2b;
+  --color-accent-red-bright: #c23a3a;
+  --color-accent-amber: #c98a3a;
+  --color-accent-thread: #b3372f;
+
+  /* Text on dark */
+  --color-text-primary: #ece6d6;
+  --color-text-secondary: #a89f88;
+  --color-text-muted: #6b6353;
+
+  /* Category colors (evidence categories) */
+  --color-cat-physical: #9c2b2b;
+  --color-cat-digital: #3a7ca5;
+  --color-cat-location: #4a8f5c;
+  --color-cat-human: #c98a3a;
+  --color-cat-timeline: #8a5fc9;
+
+  /* Importance */
+  --color-importance-critical: #c23a3a;
+  --color-importance-high: #c98a3a;
+  --color-importance-medium: #c9b23a;
+  --color-importance-low: #6b6353;
+
+  /* Type */
+  --font-typewriter: "Courier New", Courier, monospace;
+  --font-interface: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+
+  /* Spacing / radii */
+  --radius-card: 3px;
+  --radius-panel: 6px;
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.02) inset;
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.5);
 }

@@ -1,7 +1,6 @@
 import { useCaseStateStore } from "@/engine/caseState";
 import { clues } from "@/data/clues";
 import { suspects } from "@/data/suspects";
-import { computeProgress } from "@/engine/caseProgress";
 import type { Clue, Suspect } from "@/types";
 
 /**
@@ -16,7 +15,6 @@ export function useCaseState() {
 
   const discoveredClues: Clue[] = clues.filter((c) => store.discoveredClueIds.has(c.id));
   const allSuspects: Suspect[] = suspects;
-  const progress = computeProgress(store.discoveredClueIds, store.connections);
 
   return {
     discoveredClues,
@@ -25,9 +23,6 @@ export function useCaseState() {
     boardPositions: store.boardPositions,
     connections: store.connections,
     notes: store.notes,
-    /** discoveredClueCount, totalClueCount, connectionCount, progressPercent, etc. —
-     * drives the "CONNECTIONS: 12  CLUES: 17  PROGRESS 64%" style footer. */
-    progress,
 
     discoverClue: store.discoverClue,
     isDiscovered: store.isDiscovered,
@@ -36,7 +31,5 @@ export function useCaseState() {
     removeConnection: store.removeConnection,
     setNote: store.setNote,
     reset: store.reset,
-    /** call after meaningful state changes, or on an interval/beforeunload, to save to localStorage */
-    persist: store.persist,
   };
 }

@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { clues } from "@/data/clues";
 import type { Relationship } from "@/types";
-import { saveProgress, loadProgress, clearProgress, type PersistedProgress } from "./persistence";
 
 export interface PlayerConnection {
   id: string;
@@ -25,8 +24,6 @@ interface CaseStateShape {
   removeConnection: (connectionId: string) => void;
   setNote: (clueId: string, text: string) => void;
   reset: () => void;
-  /** explicit save-to-localStorage — call from a UI "save" action or on an interval/unload */
-  persist: () => void;
 }
 
 const defaultDiscovered = new Set(
@@ -39,35 +36,11 @@ const defaultPositions = Object.fromEntries(
     .map((c) => [c.id, c.boardPosition as { x: number; y: number }])
 );
 
-// Hydrate from a previous session if a valid save exists. Falls back to defaults
-// silently if there's nothing saved or the save is corrupted (see persistence.ts).
-const saved = loadProgress();
-
-const initialDiscovered = saved
-  ? new Set([...defaultDiscovered, ...saved.discoveredClueIds])
-  : new Set(defaultDiscovered);
-
-const initialPositions = saved
-  ? { ...defaultPositions, ...saved.boardPositions }
-  : { ...defaultPositions };
-
-const initialConnections: PlayerConnection[] = saved
-  ? saved.connections.map((c) => ({
-      id: c.id,
-      source: c.source,
-      target: c.target,
-      type: c.type as Relationship["type"],
-      playerMade: c.playerMade,
-    }))
-  : [];
-
-const initialNotes = saved ? { ...saved.notes } : {};
-
 export const useCaseStateStore = create<CaseStateShape>((set, get) => ({
-  discoveredClueIds: initialDiscovered,
-  boardPositions: initialPositions,
-  connections: initialConnections,
-  notes: initialNotes,
+  discoveredClueIds: new Set(defaultDiscovered),
+  boardPositions: { ...defaultPositions },
+  connections: [],
+  notes: {},
 
   discoverClue: (clueId) =>
     set((state) => {
@@ -99,25 +72,11 @@ export const useCaseStateStore = create<CaseStateShape>((set, get) => ({
   setNote: (clueId, text) =>
     set((state) => ({ notes: { ...state.notes, [clueId]: text } })),
 
-  reset: () => {
-    clearProgress();
+  reset: () =>
     set({
       discoveredClueIds: new Set(defaultDiscovered),
       boardPositions: { ...defaultPositions },
       connections: [],
       notes: {},
-    });
-  },
-
-  persist: () => {
-    const state = get();
-    const data: PersistedProgress = {
-      discoveredClueIds: [...state.discoveredClueIds],
-      boardPositions: state.boardPositions,
-      connections: state.connections,
-      notes: state.notes,
-      savedAt: new Date().toISOString(),
-    };
-    saveProgress(data);
-  },
+    }),
 }));

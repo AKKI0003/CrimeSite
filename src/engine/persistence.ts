@@ -25,35 +25,11 @@ export function saveProgress(data: PersistedProgress): void {
   }
 }
 
-function isValidPersistedProgress(value: unknown): value is PersistedProgress {
-  if (typeof value !== "object" || value === null) return false;
-  const v = value as Record<string, unknown>;
-  return (
-    Array.isArray(v.discoveredClueIds) &&
-    typeof v.boardPositions === "object" &&
-    v.boardPositions !== null &&
-    Array.isArray(v.connections) &&
-    typeof v.notes === "object" &&
-    v.notes !== null &&
-    typeof v.savedAt === "string"
-  );
-}
-
-/**
- * Returns null on missing, corrupted, or shape-mismatched data instead of throwing —
- * a bad localStorage entry (partial write, old schema version, manual tampering)
- * should degrade to "start fresh," never crash the app on load.
- */
 export function loadProgress(): PersistedProgress | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!isValidPersistedProgress(parsed)) {
-      console.warn("Saved progress has an unexpected shape, ignoring and starting fresh.");
-      return null;
-    }
-    return parsed;
+    return JSON.parse(raw) as PersistedProgress;
   } catch (err) {
     console.error("Failed to load progress:", err);
     return null;
