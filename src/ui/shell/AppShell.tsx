@@ -3,6 +3,7 @@ import { EvidenceBoard } from "@/ui/board/EvidenceBoard";
 import { SuspectPanel } from "@/ui/suspects/SuspectPanel";
 import { TimelineView } from "@/ui/timeline/TimelineView";
 import { TheoryBuilder } from "@/ui/theory/TheoryBuilder";
+import { AmbientAudio } from "@/ui/shell/AmbientAudio";
 import { useCaseState } from "@/hooks/useCaseState";
 import { useContradictions } from "@/hooks/useContradictions";
 
@@ -52,6 +53,8 @@ export function AppShell() {
               <span className="sm:hidden">⚠</span>
             </span>
           </div>
+
+          <AmbientAudio />
 
           <button
             onClick={() => setTheoryOpen(true)}

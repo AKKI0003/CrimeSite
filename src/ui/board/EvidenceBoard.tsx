@@ -7,6 +7,7 @@ import { EvidenceCard } from "@/ui/board/EvidenceCard";
 import { BoardControls } from "@/ui/board/BoardControls";
 import { ConnectionLine } from "@/ui/board/ConnectionLine";
 import { EvidenceInspector } from "@/ui/evidence-detail/EvidenceInspector";
+import { playConnectionThud } from "@/engine/audio";
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 1.75;
@@ -176,6 +177,11 @@ export function EvidenceBoard() {
           removeConnection(existing.id);
         } else {
           addConnection(cur, id, "related_to");
+          try {
+            playConnectionThud();
+          } catch {
+            /* audio not available yet — non-critical, ignore */
+          }
         }
         return null;
       });

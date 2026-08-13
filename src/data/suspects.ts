@@ -19,6 +19,40 @@ export const suspects: Suspect[] = [
     ],
     relatedEvidence: ["clue_06", "clue_07"],
     isActuallyResponsible: false,
+    interrogationTopics: [
+      {
+        id: "rahul_topic_alibi",
+        label: "Where were you that night?",
+        response:
+          "Home. I told you — home, alone, the whole night. I didn't even talk to her after nine.",
+        tone: "defensive",
+      },
+      {
+        id: "rahul_topic_wifi",
+        label: "Your Wi-Fi log says otherwise.",
+        response:
+          "...Fine. I left. Around eleven. But it's not what it looks like — I wasn't near her building, and I had nothing to do with whatever happened to her.",
+        tone: "nervous",
+        relatedClueIds: ["clue_06"],
+        unlocksAfterClueId: "clue_06",
+      },
+      {
+        id: "rahul_topic_neha",
+        label: "How was Neha, lately?",
+        response:
+          "Distracted. Secretive, honestly. She'd go quiet mid-conversation, like she was somewhere else in her head. I thought it was us. It wasn't about us.",
+        tone: "calm",
+      },
+      {
+        id: "rahul_topic_driver",
+        label: "A delivery driver placed a car near her building.",
+        response:
+          "I'm not going to answer that. Ask me something else.",
+        tone: "hostile",
+        relatedClueIds: ["clue_07"],
+        unlocksAfterClueId: "clue_07",
+      },
+    ],
   },
   {
     id: "suspect_tara",
@@ -38,6 +72,40 @@ export const suspects: Suspect[] = [
     ],
     relatedEvidence: ["clue_04", "clue_14"],
     isActuallyResponsible: false,
+    interrogationTopics: [
+      {
+        id: "tara_topic_alibi",
+        label: "Where were you that night?",
+        response:
+          "In my apartment. I don't really remember stepping out — it was a normal night, until it wasn't.",
+        tone: "calm",
+      },
+      {
+        id: "tara_topic_fob",
+        label: "Your fob log shows you left your floor at 11:38.",
+        response:
+          "You have a lot of logs for someone who thinks Neha's missing. Fine — I stepped out for a few minutes. It has nothing to do with her.",
+        tone: "evasive",
+        relatedClueIds: ["clue_14"],
+        unlocksAfterClueId: "clue_14",
+      },
+      {
+        id: "tara_topic_mirroring",
+        label: "Explain the phone-mirroring login.",
+        response:
+          "I— that's private. It's not what you think it is. I'm not saying anything else without a lawyer in the room.",
+        tone: "nervous",
+        relatedClueIds: ["clue_04"],
+        unlocksAfterClueId: "clue_04",
+      },
+      {
+        id: "tara_topic_friendship",
+        label: "How well do you know Neha?",
+        response:
+          "Better than anyone in this building. If something happened to her, I'd know. I'd feel it.",
+        tone: "defensive",
+      },
+    ],
   },
   {
     id: "suspect_vikram",
@@ -57,6 +125,39 @@ export const suspects: Suspect[] = [
     ],
     relatedEvidence: ["clue_01", "clue_08"],
     isActuallyResponsible: true,
+    interrogationTopics: [
+      {
+        id: "vikram_topic_generic",
+        label: "What happened that night?",
+        response: "I don't have anything to say about that night.",
+        tone: "hostile",
+      },
+      {
+        id: "vikram_topic_fob",
+        label: "Your fob placed you there for thirty minutes.",
+        response:
+          "I was doing my job. That's the extent of what I'm prepared to say without counsel present.",
+        tone: "evasive",
+        relatedClueIds: ["clue_08"],
+        unlocksAfterClueId: "clue_08",
+      },
+      {
+        id: "vikram_topic_door",
+        label: "The lock damage report matches forced entry.",
+        response:
+          "...I was sent to retrieve something. That's the truth. I never touched her, and I never saw her.",
+        tone: "nervous",
+        relatedClueIds: ["clue_01"],
+        unlocksAfterClueId: "clue_01",
+      },
+      {
+        id: "vikram_topic_arjun",
+        label: "Did Arjun Mehra send you there?",
+        response:
+          "I take instructions from corporate security leadership. I'm not going to elaborate further.",
+        tone: "defensive",
+      },
+    ],
   },
   {
     id: "suspect_priya",
@@ -76,6 +177,40 @@ export const suspects: Suspect[] = [
     ],
     relatedEvidence: ["clue_10", "clue_11", "clue_12"],
     isActuallyResponsible: false,
+    interrogationTopics: [
+      {
+        id: "priya_topic_relationship",
+        label: "What was your relationship with Neha?",
+        response:
+          "She reported into finance for vendor reconciliation. Professional, mostly cordial. We disagreed near the end.",
+        tone: "calm",
+      },
+      {
+        id: "priya_topic_invoices",
+        label: "Your signature is on the Corebridge invoices.",
+        response:
+          "Neha and I disagreed about how to read some vendor numbers. That's all it was.",
+        tone: "defensive",
+        relatedClueIds: ["clue_11"],
+        unlocksAfterClueId: "clue_11",
+      },
+      {
+        id: "priya_topic_call",
+        label: "We have a recording of your call with her.",
+        response:
+          "...I asked her to let it go until after the funding round closed. I'm not proud of that call. But I never went near her apartment.",
+        tone: "nervous",
+        relatedClueIds: ["clue_12"],
+        unlocksAfterClueId: "clue_12",
+      },
+      {
+        id: "priya_topic_vikram",
+        label: "Did you know about the break-in?",
+        response:
+          "No. God, no. If Vikram did something like that, that was Arjun's call, not mine.",
+        tone: "evasive",
+      },
+    ],
   },
   {
     id: "suspect_arjun",
@@ -95,6 +230,42 @@ export const suspects: Suspect[] = [
     ],
     relatedEvidence: ["clue_08", "clue_09", "clue_10"],
     isActuallyResponsible: true,
+    interrogationTopics: [
+      {
+        id: "arjun_topic_statement",
+        label: "Do you know what happened to Neha?",
+        response:
+          "This is a tragedy. Whatever the company can do to help find her, we will. I mean that.",
+        tone: "calm",
+      },
+      {
+        id: "arjun_topic_deletion",
+        label: "Someone wiped server logs the night she vanished.",
+        response:
+          "I authorized a routine data retention cleanup. If the timing looks bad, I understand that — but it had nothing to do with Neha personally.",
+        tone: "defensive",
+        relatedClueIds: ["clue_09"],
+        unlocksAfterClueId: "clue_09",
+      },
+      {
+        id: "arjun_topic_vikram",
+        label: "You sent Vikram into her apartment.",
+        response:
+          "I asked security to confirm whether she'd taken company materials. I did not authorize anyone to hurt her. I didn't think anyone would.",
+        tone: "nervous",
+        relatedClueIds: ["clue_08"],
+        unlocksAfterClueId: "clue_08",
+      },
+      {
+        id: "arjun_topic_fraud",
+        label: "The Corebridge invoices point to fraud.",
+        response:
+          "I have nothing further to say about ongoing vendor matters without our counsel present.",
+        tone: "hostile",
+        relatedClueIds: ["clue_10"],
+        unlocksAfterClueId: "clue_10",
+      },
+    ],
   },
   {
     id: "suspect_sameer",
@@ -114,5 +285,29 @@ export const suspects: Suspect[] = [
     ],
     relatedEvidence: ["clue_15"],
     isActuallyResponsible: false,
+    interrogationTopics: [
+      {
+        id: "sameer_topic_rounds",
+        label: "Walk me through your rounds that night.",
+        response: "I did my usual rounds that night, nothing out of the ordinary.",
+        tone: "calm",
+      },
+      {
+        id: "sameer_topic_log",
+        label: "The guard log doesn't match the resident statements.",
+        response:
+          "Okay — look, that's personal, it's got nothing to do with the Kapoor case. Please don't put this in the report.",
+        tone: "nervous",
+        relatedClueIds: ["clue_15"],
+        unlocksAfterClueId: "clue_15",
+      },
+      {
+        id: "sameer_topic_neha",
+        label: "Did you see Neha leave that night?",
+        response:
+          "Honestly? I wasn't at the desk the whole time. I can't swear to every minute.",
+        tone: "evasive",
+      },
+    ],
   },
 ];

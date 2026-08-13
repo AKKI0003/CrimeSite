@@ -8,6 +8,22 @@ export interface SuspectStatement {
   trueMeaning?: string;
 }
 
+export interface InterrogationTopic {
+  id: string;
+  /** short label shown on the "ask about" button, e.g. "The 11:42 text" */
+  label: string;
+  /** the response text, typed out live in the interrogation UI */
+  response: string;
+  /** suspect's demeanor while answering this topic — purely presentational,
+   *  read by ui/ to drive avatar/tone but never gates any game logic */
+  tone?: "calm" | "defensive" | "evasive" | "nervous" | "hostile";
+  /** clue ids this response references, if the UI wants to cross-link them */
+  relatedClueIds?: string[];
+  /** only offer this topic once a given clue has been discovered — optional gating,
+   *  same pattern as Clue.unlocksAfter. Omit for always-available topics. */
+  unlocksAfterClueId?: string;
+}
+
 export interface Suspect {
   id: string;
   name: string;
@@ -22,4 +38,7 @@ export interface Suspect {
   relatedEvidence: string[];
   /** true only for the internal answer key — never read by UI to render anything visible */
   isActuallyResponsible: boolean;
+  /** additive, optional — powers the interrogation modal's "ask about" system.
+   *  Suspects without this fall back to their single `statements` entry. */
+  interrogationTopics?: InterrogationTopic[];
 }
