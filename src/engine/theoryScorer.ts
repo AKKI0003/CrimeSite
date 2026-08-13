@@ -124,3 +124,13 @@ export function scoreTheory(theory: PlayerTheory): ScoringResult {
 
   return { overallScore, rank, categoryScores };
 }
+
+/**
+ * The only sanctioned way for ui/ to see the true-story summary text — always call
+ * this AFTER scoreTheory(), for the reveal screen. ui/ must never import
+ * @/data/solution directly; that keeps the one file holding the answer key behind
+ * this single, obvious chokepoint.
+ */
+export function getFinalExplanationSummary(): string {
+  return SOLUTION.finalExplanationSummary;
+}

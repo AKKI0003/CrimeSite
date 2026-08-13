@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { clues } from "@/data/clues";
 import type { Relationship } from "@/types";
+import { cascadeUnlocks } from "./clueUnlockEngine";
 
 export interface PlayerConnection {
   id: string;
@@ -46,7 +47,9 @@ export const useCaseStateStore = create<CaseStateShape>((set, get) => ({
     set((state) => {
       const next = new Set(state.discoveredClueIds);
       next.add(clueId);
-      return { discoveredClueIds: next };
+      // cascadeUnlocks handles chains: discovering this clue might satisfy the
+      // prerequisites for one or more gated clues, possibly in sequence.
+      return { discoveredClueIds: cascadeUnlocks(next) };
     }),
 
   isDiscovered: (clueId) => get().discoveredClueIds.has(clueId),

@@ -9,27 +9,44 @@ import type { Clue, Suspect } from "@/types";
  * or stored without ever breaking a component that uses this hook, as long as the
  * return shape below stays the same. If you need something new, ask for a new field
  * here rather than reaching into @/engine yourself.
+ *
+ * PERFORMANCE: subscribes to each store slice individually instead of the whole
+ * store object, so e.g. typing a note doesn't re-render the board's discoveredClues
+ * derivation, and dragging a card doesn't re-render the suspect panel. Combined with
+ * EvidenceBoard's motion-value-based pan/drag, this keeps state-driven re-renders
+ * scoped to only the components that actually read the changed slice.
  */
 export function useCaseState() {
-  const store = useCaseStateStore();
+  const discoveredClueIds = useCaseStateStore((s) => s.discoveredClueIds);
+  const boardPositions = useCaseStateStore((s) => s.boardPositions);
+  const connections = useCaseStateStore((s) => s.connections);
+  const notes = useCaseStateStore((s) => s.notes);
 
-  const discoveredClues: Clue[] = clues.filter((c) => store.discoveredClueIds.has(c.id));
+  const discoverClue = useCaseStateStore((s) => s.discoverClue);
+  const isDiscovered = useCaseStateStore((s) => s.isDiscovered);
+  const moveCard = useCaseStateStore((s) => s.moveCard);
+  const addConnection = useCaseStateStore((s) => s.addConnection);
+  const removeConnection = useCaseStateStore((s) => s.removeConnection);
+  const setNote = useCaseStateStore((s) => s.setNote);
+  const reset = useCaseStateStore((s) => s.reset);
+
+  const discoveredClues: Clue[] = clues.filter((c) => discoveredClueIds.has(c.id));
   const allSuspects: Suspect[] = suspects;
 
   return {
     discoveredClues,
     allClues: clues,
     allSuspects,
-    boardPositions: store.boardPositions,
-    connections: store.connections,
-    notes: store.notes,
+    boardPositions,
+    connections,
+    notes,
 
-    discoverClue: store.discoverClue,
-    isDiscovered: store.isDiscovered,
-    moveCard: store.moveCard,
-    addConnection: store.addConnection,
-    removeConnection: store.removeConnection,
-    setNote: store.setNote,
-    reset: store.reset,
+    discoverClue,
+    isDiscovered,
+    moveCard,
+    addConnection,
+    removeConnection,
+    setNote,
+    reset,
   };
 }

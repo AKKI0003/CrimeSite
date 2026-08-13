@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type WheelEvent } fr
 import type { MotionValue } from "framer-motion";
 import { useCaseState } from "@/hooks/useCaseState";
 import { useContradictions } from "@/hooks/useContradictions";
+import { useUnlockLeads } from "@/hooks/useUnlockLeads";
 import { EvidenceCard } from "@/ui/board/EvidenceCard";
 import { BoardControls } from "@/ui/board/BoardControls";
 import { ConnectionLine } from "@/ui/board/ConnectionLine";
@@ -23,13 +24,14 @@ const MAX_ZOOM = 1.75;
 // but is applied the same way (via the transform effect below) rather than
 // re-rendering the card list.
 export function EvidenceBoard() {
-  const { discoveredClues, allSuspects, boardPositions, connections, moveCard, addConnection, removeConnection } =
+  const { discoveredClues, allSuspects, boardPositions, connections, moveCard, addConnection, removeConnection, discoverClue } =
     useCaseState();
   const { activeContradictions } = useContradictions();
 
   const [zoom, setZoom] = useState(1);
   const [search, setSearch] = useState("");
   const [openClueId, setOpenClueId] = useState<string | null>(null);
+  const unlockLeads = useUnlockLeads(openClueId);
   const [pendingConnectId, setPendingConnectId] = useState<string | null>(null);
   // Off by default: these are the case file's own answer-key relationships,
   // not something the player has discovered. See BoardControls for why.
@@ -257,6 +259,8 @@ export function EvidenceBoard() {
         clue={discoveredClues.find((c) => c.id === openClueId) ?? null}
         suspects={allSuspects}
         onClose={() => setOpenClueId(null)}
+        unlockLeads={unlockLeads}
+        onDigDeeper={(id) => discoverClue(id)}
       />
     </div>
   );

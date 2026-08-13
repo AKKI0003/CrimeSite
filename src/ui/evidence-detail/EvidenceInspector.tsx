@@ -21,11 +21,15 @@ interface EvidenceInspectorProps {
   clue: Clue | null;
   suspects: Suspect[];
   onClose: () => void;
+  /** locked clues that are now reachable because of this clue — renders a
+   *  "Dig Deeper" prompt instead of unlocking them silently. See useUnlockLeads. */
+  unlockLeads?: Clue[];
+  onDigDeeper?: (clueId: string) => void;
 }
 
 // Day 2: full-text detail view for a clue, opened via EvidenceCard's
 // onDoubleClick. Previously a no-op — this is the first real destination.
-export function EvidenceInspector({ clue, suspects, onClose }: EvidenceInspectorProps) {
+export function EvidenceInspector({ clue, suspects, onClose, unlockLeads = [], onDigDeeper }: EvidenceInspectorProps) {
   useEffect(() => {
     if (!clue) return;
     function onKey(e: KeyboardEvent) {
@@ -119,6 +123,29 @@ export function EvidenceInspector({ clue, suspects, onClose }: EvidenceInspector
                     </li>
                   ))}
                 </ul>
+              </div>
+            )}
+            {unlockLeads.length > 0 && (
+              <div className="mt-4 border-t border-dashed border-[var(--color-accent-amber)]/50 pt-3">
+                <p className="font-[var(--font-typewriter)] text-[10px] uppercase tracking-wide text-[var(--color-accent-amber)]">
+                  Something else might be connected here
+                </p>
+                <div className="mt-2 space-y-2">
+                  {unlockLeads.map((lead) => (
+                    <button
+                      key={lead.id}
+                      onClick={() => onDigDeeper?.(lead.id)}
+                      className="w-full rounded-sm border border-[var(--color-accent-amber)]/60 bg-[var(--color-accent-amber)]/10 px-3 py-2 text-left transition-colors hover:bg-[var(--color-accent-amber)]/20"
+                    >
+                      <p className="font-[var(--font-typewriter)] text-[11px] uppercase tracking-wide text-[var(--color-accent-amber)]">
+                        Dig Deeper
+                      </p>
+                      <p className="mt-0.5 font-[var(--font-display)] text-[13px] font-semibold text-[var(--color-ink)]">
+                        {lead.title}
+                      </p>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </motion.div>

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { PlayerTheory } from "@/types";
 import { validateTheory, withDefaults } from "@/engine/validation";
-import { scoreTheory } from "@/engine/theoryScorer";
+import { scoreTheory, getFinalExplanationSummary } from "@/engine/theoryScorer";
 
 /**
  * Wraps validation + scoring for the TheoryBuilder screen. Dev A: use this instead
@@ -26,5 +26,5 @@ export function useTheoryValidation(draft: Partial<PlayerTheory>) {
     return scoreTheory(complete);
   }
 
-  return { validation, submit, previewScore };
+  return { validation, submit, previewScore, finalExplanationSummary: getFinalExplanationSummary() };
 }

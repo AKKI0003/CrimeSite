@@ -2,6 +2,7 @@ import { useState } from "react";
 import { EvidenceBoard } from "@/ui/board/EvidenceBoard";
 import { SuspectPanel } from "@/ui/suspects/SuspectPanel";
 import { TimelineView } from "@/ui/timeline/TimelineView";
+import { TheoryBuilder } from "@/ui/theory/TheoryBuilder";
 import { useCaseState } from "@/hooks/useCaseState";
 import { useContradictions } from "@/hooks/useContradictions";
 
@@ -11,6 +12,7 @@ export function AppShell() {
   const { discoveredClues, allClues } = useCaseState();
   const { activeContradictions } = useContradictions();
   const [mobileTab, setMobileTab] = useState<MobileTab>("board");
+  const [theoryOpen, setTheoryOpen] = useState(false);
 
   return (
     <div className="fx-crt flex h-[100dvh] w-full flex-col overflow-hidden bg-[var(--color-bg)] text-[var(--color-text-primary)]">
@@ -32,22 +34,32 @@ export function AppShell() {
           </span>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 font-[var(--font-typewriter)] text-[10px] text-[var(--color-text-secondary)] sm:gap-4 sm:text-xs">
-          <span>
-            {discoveredClues.length}/{allClues.length}
-            <span className="hidden sm:inline"> EVIDENCE</span>
-          </span>
-          <span
-            className={
-              activeContradictions.length > 0
-                ? "text-[var(--color-accent-red-bright)]"
-                : "text-[var(--color-text-muted)]"
-            }
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 font-[var(--font-typewriter)] text-[10px] text-[var(--color-text-secondary)] sm:gap-4 sm:text-xs">
+            <span>
+              {discoveredClues.length}/{allClues.length}
+              <span className="hidden sm:inline"> EVIDENCE</span>
+            </span>
+            <span
+              className={
+                activeContradictions.length > 0
+                  ? "text-[var(--color-accent-red-bright)]"
+                  : "text-[var(--color-text-muted)]"
+              }
+            >
+              {activeContradictions.length}
+              <span className="hidden sm:inline"> CONTRADICTION{activeContradictions.length === 1 ? "" : "S"}</span>
+              <span className="sm:hidden">⚠</span>
+            </span>
+          </div>
+
+          <button
+            onClick={() => setTheoryOpen(true)}
+            className="rounded-sm bg-[var(--color-accent-red)] px-2.5 py-1.5 font-[var(--font-typewriter)] text-[10px] uppercase tracking-wide text-[var(--color-paper)] sm:px-3 sm:text-[11px]"
           >
-            {activeContradictions.length}
-            <span className="hidden sm:inline"> CONTRADICTION{activeContradictions.length === 1 ? "" : "S"}</span>
-            <span className="sm:hidden">⚠</span>
-          </span>
+            <span className="sm:hidden">Theory</span>
+            <span className="hidden sm:inline">Submit Theory</span>
+          </button>
         </div>
       </header>
 
@@ -90,6 +102,8 @@ export function AppShell() {
           <MobileTabButton label="Timeline" active={mobileTab === "timeline"} onClick={() => setMobileTab("timeline")} />
         </nav>
       </main>
+
+      {theoryOpen && <TheoryBuilder onClose={() => setTheoryOpen(false)} />}
     </div>
   );
 }
