@@ -24,6 +24,16 @@ export interface InterrogationTopic {
   unlocksAfterClueId?: string;
 }
 
+export interface EvidenceReaction {
+  /** the clue id being presented to the suspect */
+  clueId: string;
+  /** their reaction when confronted with specifically this piece of evidence */
+  reaction: string;
+  tone?: "calm" | "defensive" | "evasive" | "nervous" | "hostile" | "cornered";
+  /** how much this confrontation should move the pressure meter (default 2) */
+  pressureValue?: number;
+}
+
 export interface Suspect {
   id: string;
   name: string;
@@ -41,4 +51,13 @@ export interface Suspect {
   /** additive, optional — powers the interrogation modal's "ask about" system.
    *  Suspects without this fall back to their single `statements` entry. */
   interrogationTopics?: InterrogationTopic[];
+  /** additive, optional — reactions to being confronted with specific evidence
+   *  during interrogation. Falls back to `defaultEvidenceReaction` if the
+   *  presented clue isn't in this list. */
+  evidenceReactions?: EvidenceReaction[];
+  /** shown when the player presents evidence that has no specific reaction authored */
+  defaultEvidenceReaction?: string;
+  /** unlocked once the interrogation's pressure meter fills — the "crack in
+   *  the story" moment. Optional; suspects without one just cap out calmly. */
+  breakthroughResponse?: string;
 }

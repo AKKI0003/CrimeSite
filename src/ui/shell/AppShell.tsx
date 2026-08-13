@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EvidenceBoard } from "@/ui/board/EvidenceBoard";
 import { SuspectPanel } from "@/ui/suspects/SuspectPanel";
 import { TimelineView } from "@/ui/timeline/TimelineView";
@@ -6,6 +6,8 @@ import { TheoryBuilder } from "@/ui/theory/TheoryBuilder";
 import { AmbientAudio } from "@/ui/shell/AmbientAudio";
 import { useCaseState } from "@/hooks/useCaseState";
 import { useContradictions } from "@/hooks/useContradictions";
+import { playStamp } from "@/engine/audio";
+import { AnimatePresence, motion } from "framer-motion";
 
 type MobileTab = "suspects" | "board" | "timeline";
 
@@ -14,6 +16,23 @@ export function AppShell() {
   const { activeContradictions } = useContradictions();
   const [mobileTab, setMobileTab] = useState<MobileTab>("board");
   const [theoryOpen, setTheoryOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const prevContradictionCount = useRef(0);
+
+  useEffect(() => {
+    if (activeContradictions.length > prevContradictionCount.current) {
+      setToast("CONTRADICTION FLAGGED — evidence doesn't line up.");
+      try {
+        playStamp();
+      } catch {
+        /* audio unavailable before first user gesture — non-critical */
+      }
+      const t = window.setTimeout(() => setToast(null), 2600);
+      prevContradictionCount.current = activeContradictions.length;
+      return () => window.clearTimeout(t);
+    }
+    prevContradictionCount.current = activeContradictions.length;
+  }, [activeContradictions.length]);
 
   return (
     <div className="fx-crt flex h-[100dvh] w-full flex-col overflow-hidden bg-[var(--color-bg)] text-[var(--color-text-primary)]">
@@ -107,6 +126,19 @@ export function AppShell() {
       </main>
 
       {theoryOpen && <TheoryBuilder onClose={() => setTheoryOpen(false)} />}
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            className="pointer-events-none fixed left-1/2 top-3 z-50 -translate-x-1/2 rounded-sm border border-[var(--color-accent-red-bright)] bg-[var(--color-bg-raised)] px-4 py-2 font-[var(--font-typewriter)] text-[11px] uppercase tracking-wide text-[var(--color-accent-red-bright)] shadow-lg"
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -53,6 +53,22 @@ export const suspects: Suspect[] = [
         unlocksAfterClueId: "clue_07",
       },
     ],
+    evidenceReactions: [
+      {
+        clueId: "clue_06",
+        reaction: "That's... okay, that's my Wi-Fi log. I can't explain that away, can I.",
+        tone: "cornered",
+        pressureValue: 3,
+      },
+      {
+        clueId: "clue_07",
+        reaction: "A driver saw a car? That could be anyone's car. This building has a hundred units.",
+        tone: "defensive",
+      },
+    ],
+    defaultEvidenceReaction: "I don't see what that has to do with me.",
+    breakthroughResponse:
+      "Okay. Okay — I left to pick her up. She asked me to. She said she needed to disappear for a few days and I didn't ask why, I just drove. I've been protecting her plan this whole time, not myself.",
   },
   {
     id: "suspect_tara",
@@ -106,6 +122,22 @@ export const suspects: Suspect[] = [
         tone: "defensive",
       },
     ],
+    evidenceReactions: [
+      {
+        clueId: "clue_04",
+        reaction: "You found the login. Fine. I ran the mirroring session. It wasn't to hurt her.",
+        tone: "cornered",
+        pressureValue: 3,
+      },
+      {
+        clueId: "clue_14",
+        reaction: "My fob log shows I left my floor. That's not a crime. People leave their apartments.",
+        tone: "defensive",
+      },
+    ],
+    defaultEvidenceReaction: "I'm not sure what you want me to say about that.",
+    breakthroughResponse:
+      "She came to me first. Before Rahul, before any of it. I ran the mirroring session so we could fake the 11:42 text — plant it, then let her actually leave at 10:55, clean. I did it because she asked, and because I believed her.",
   },
   {
     id: "suspect_vikram",
@@ -158,6 +190,22 @@ export const suspects: Suspect[] = [
         tone: "defensive",
       },
     ],
+    evidenceReactions: [
+      {
+        clueId: "clue_01",
+        reaction: "The lock, yes. I forced it. I didn't want to, but I had a job to finish.",
+        tone: "cornered",
+        pressureValue: 3,
+      },
+      {
+        clueId: "clue_08",
+        reaction: "My fob puts me there for thirty minutes, correct. Doing my job. Nothing more.",
+        tone: "defensive",
+      },
+    ],
+    defaultEvidenceReaction: "That's outside what I'm able to discuss.",
+    breakthroughResponse:
+      "Fine. Arjun told me to search her apartment for whatever she'd taken from the servers — documents, drives, anything. I broke the lock, searched the place, found nothing, and left. I never touched her. I never saw her. That's the whole of it.",
   },
   {
     id: "suspect_priya",
@@ -211,6 +259,22 @@ export const suspects: Suspect[] = [
         tone: "evasive",
       },
     ],
+    evidenceReactions: [
+      {
+        clueId: "clue_11",
+        reaction: "That's my signature, yes. I flagged the numbers to legal. Quietly.",
+        tone: "cornered",
+        pressureValue: 3,
+      },
+      {
+        clueId: "clue_12",
+        reaction: "You have the call. Then you already know what I said, and how I feel about it.",
+        tone: "nervous",
+      },
+    ],
+    defaultEvidenceReaction: "I don't think that changes anything about what I've told you.",
+    breakthroughResponse:
+      "I signed off on inflated Corebridge invoices for over a year, to protect the round. Neha found it and wouldn't let it go. I asked her to sit on it. She wouldn't. That's the worst thing I did — I never went near her apartment, and I didn't know Vikram had.",
   },
   {
     id: "suspect_arjun",
@@ -266,6 +330,22 @@ export const suspects: Suspect[] = [
         unlocksAfterClueId: "clue_10",
       },
     ],
+    evidenceReactions: [
+      {
+        clueId: "clue_09",
+        reaction: "The deletion log. I authorized that cleanup myself, yes.",
+        tone: "defensive",
+      },
+      {
+        clueId: "clue_08",
+        reaction: "You want me to explain why my head of security was in her apartment. Get counsel in the room first.",
+        tone: "cornered",
+        pressureValue: 3,
+      },
+    ],
+    defaultEvidenceReaction: "I'm not commenting on that without our counsel present.",
+    breakthroughResponse:
+      "I sent Vikram to search her apartment for anything she'd copied off our servers before it reached a journalist. I was protecting the round, not covering up what happened to Neha — because I still don't know what happened to Neha. I want that on the record.",
   },
   {
     id: "suspect_sameer",
@@ -309,5 +389,16 @@ export const suspects: Suspect[] = [
         tone: "evasive",
       },
     ],
+    evidenceReactions: [
+      {
+        clueId: "clue_15",
+        reaction: "Alright — alright. My girlfriend. I let her in around eleven and fudged the rounds log. That's the whole of it, I swear.",
+        tone: "cornered",
+        pressureValue: 3,
+      },
+    ],
+    defaultEvidenceReaction: "I don't know what to tell you about that.",
+    breakthroughResponse:
+      "It's embarrassing, not criminal. I let my girlfriend in through the side door, we sat in the break room for maybe forty minutes, and I backfilled the log so my supervisor wouldn't clock it. I never left the building unattended for more than a couple minutes, and I never saw anything happen to Neha.",
   },
 ];
