@@ -70,14 +70,22 @@ export function matchQuestion(
 }
 
 /** Resolves an AskOutcome + suspect into the actual line of dialogue and
- * tone to render, so ui/ doesn't have to branch on `kind` itself. */
+ * tone to render, so ui/ doesn't have to branch on `kind` itself. Also
+ * surfaces `revealsClueIds` for "answered" outcomes — ui/ should call
+ * discoverClue() for each id (discoverClue is self-gating, so it's safe
+ * to call even on an id whose other prerequisites aren't met yet). */
 export function resolveAskOutcome(
   outcome: AskOutcome,
   suspect: Suspect
-): { text: string; tone?: string; matchedTopicId?: string } {
+): { text: string; tone?: string; matchedTopicId?: string; revealsClueIds?: string[] } {
   switch (outcome.kind) {
     case "answered":
-      return { text: outcome.topic.response, tone: outcome.topic.tone, matchedTopicId: outcome.topic.id };
+      return {
+        text: outcome.topic.response,
+        tone: outcome.topic.tone,
+        matchedTopicId: outcome.topic.id,
+        revealsClueIds: outcome.topic.revealsClueIds,
+      };
     case "stonewalled":
       return {
         text: suspect.stonewallResponse ?? "I'm not answering that without something to back it up.",

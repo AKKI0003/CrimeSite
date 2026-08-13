@@ -40,6 +40,12 @@ export interface AudioCallActivity {
   /** transcript lines, revealed progressively as the player plays/scrubs,
    *  NOT dumped all at once under the clue title. */
   transcriptLines: string[];
+  /** clue ids to auto-discover once every transcript line has been played/
+   *  scrubbed through. Safe to list clues that also need OTHER prerequisites
+   *  (e.g. an AND-gated clue) — discoverClue() itself checks readiness, so
+   *  listing an id here that isn't fully unlockable yet is a harmless no-op
+   *  until its other prerequisite also fires. */
+  revealsClueIds?: string[];
 }
 
 export interface DocumentCompareActivity {
@@ -53,6 +59,10 @@ export interface DocumentCompareActivity {
    *  of the clue description itself so it isn't just handed over — surfaced
    *  by ui/ only after the player attempts the comparison. */
   discrepancyHint: string;
+  /** clue ids to auto-discover once the player has actually flagged the
+   *  discrepancy (not just opened the comparison view). Same no-op-if-not-
+   *  ready semantics as the audio activity's field above. */
+  revealsClueIds?: string[];
 }
 
 export interface PhotoExamineActivity {
@@ -61,6 +71,9 @@ export interface PhotoExamineActivity {
   /** hotspot regions worth a closer look, in % of image width/height, so
    *  ui/ can render click-to-zoom points instead of one flat description */
   hotspots: { x: number; y: number; label: string; detail: string }[];
+  /** clue ids to auto-discover once every hotspot has been opened at least
+   *  once. Same no-op-if-not-ready semantics as above. */
+  revealsClueIds?: string[];
 }
 
 export type ClueActivity =

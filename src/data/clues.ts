@@ -23,8 +23,31 @@ export const clues: Clue[] = [
     category: "digital",
     title: "Phone Recovery Report",
     summary: "Neha's phone was found still inside the apartment.",
-    description:
-      "Neha's personal phone was recovered on the kitchen counter, powered on, no signs of damage. Battery at 61%. Investigators initially treated this as evidence she left in a hurry or was taken while the phone was left behind.",
+    description: "Recovered on the kitchen counter, powered on. Look it over properly.",
+    activity: {
+      kind: "photo_examine",
+      hotspots: [
+        {
+          x: 30,
+          y: 55,
+          label: "Screen, unlocked",
+          detail: "Battery at 61%, screen unlocked and face-up — not how someone leaves a phone if they're hiding it.",
+        },
+        {
+          x: 60,
+          y: 40,
+          label: "Messaging app, open",
+          detail: "Last app in the foreground is the messaging thread with the 11:42 PM text still visible in the notification bar.",
+        },
+        {
+          x: 75,
+          y: 70,
+          label: "Charging cable, still plugged in",
+          detail: "The cable is coiled but still plugged into the counter outlet — she didn't grab it on the way out, if she left at all.",
+        },
+      ],
+      revealsClueIds: ["clue_03", "clue_16", "clue_17"],
+    },
     relatedSuspects: [],
     relationships: [{ target: "clue_03", type: "related_to" }],
     importance: "medium",
@@ -36,8 +59,31 @@ export const clues: Clue[] = [
     category: "digital",
     title: 'Outgoing Text — "just about to sleep, ttyl"',
     summary: "Sent from Neha's phone at 11:42 PM.",
-    description:
-      'A text message sent from Neha\'s phone to a friend at 11:42 PM reading "just about to sleep, ttyl" — treated by investigators as the last confirmed sign of life and the anchor point for "the disappearance."',
+    description: "The last confirmed sign of life, per investigators. Look at the message itself, not just the summary.",
+    activity: {
+      kind: "photo_examine",
+      hotspots: [
+        {
+          x: 50,
+          y: 30,
+          label: "Timestamp",
+          detail: "11:42 PM — sent nearly two hours after the lobby camera's last confirmed sighting of her at 9:40 PM.",
+        },
+        {
+          x: 50,
+          y: 55,
+          label: "Message text",
+          detail: '"just about to sleep, ttyl" — short, casual, nothing alarming on its face.',
+        },
+        {
+          x: 50,
+          y: 80,
+          label: "Typing pattern metadata",
+          detail: "Composed and sent in under four seconds flat — unusually fast for a message that length, more consistent with a saved draft or someone else typing it.",
+        },
+      ],
+      revealsClueIds: ["clue_04"],
+    },
     timestamp: "11:42 PM",
     relatedSuspects: [],
     relationships: [{ target: "clue_04", type: "contradicts" }],
@@ -69,8 +115,31 @@ export const clues: Clue[] = [
     category: "location",
     title: "Rear Stairwell Camera Maintenance Log",
     summary: "The rear stairwell camera has been broken for weeks.",
-    description:
-      "Building maintenance records show the rear stairwell camera was reported broken 19 days before the disappearance and was never repaired, due to a backlog. This means there is no footage of anyone using that exit.",
+    description: "Maintenance log entries. Worth reading closely — the dates matter.",
+    activity: {
+      kind: "photo_examine",
+      hotspots: [
+        {
+          x: 30,
+          y: 40,
+          label: "Fault reported",
+          detail: "Reported broken 19 days before the disappearance — well before anyone could have planned around it.",
+        },
+        {
+          x: 65,
+          y: 40,
+          label: "Repair ticket status",
+          detail: "Status: \"Backlogged — no ETA.\" Never actioned. No footage exists of that exit for the entire window.",
+        },
+        {
+          x: 50,
+          y: 75,
+          label: "Building staff sign-off",
+          detail: "Signed off by the same maintenance supervisor who logs Sameer's guard shift assignments.",
+        },
+      ],
+      revealsClueIds: ["clue_15"],
+    },
     relatedSuspects: [],
     relationships: [{ target: "clue_18", type: "related_to" }],
     importance: "medium",
@@ -198,6 +267,7 @@ export const clues: Clue[] = [
         "PRIYA: Just — sit on it until after the round closes. Please.",
         "[call ends]",
       ],
+      revealsClueIds: ["clue_10"],
     },
     relatedSuspects: ["suspect_priya"],
     relationships: [{ target: "clue_10", type: "related_to" }],
@@ -267,8 +337,31 @@ export const clues: Clue[] = [
     category: "physical",
     title: "Neha's Missing Laptop",
     summary: "Her personal laptop is not in the apartment.",
-    description:
-      "Neha's personal laptop, normally kept on her desk, is not present in the apartment. No sign it was stolen — desk drawers and other valuables are untouched.",
+    description: "The desk where it normally sits. Look at what's there instead of it.",
+    activity: {
+      kind: "photo_examine",
+      hotspots: [
+        {
+          x: 45,
+          y: 50,
+          label: "Empty laptop dock",
+          detail: "A dust-free rectangle on the desk exactly where the laptop always sat — recently removed, not long-missing.",
+        },
+        {
+          x: 70,
+          y: 60,
+          label: "Untouched jewelry box",
+          detail: "Sitting in plain sight next to the dock, undisturbed — rules out a simple burglary.",
+        },
+        {
+          x: 30,
+          y: 75,
+          label: "Charger cable, coiled neatly",
+          detail: "The laptop's charger is coiled and put away, not yanked out mid-grab — whoever took it did so calmly.",
+        },
+      ],
+      revealsClueIds: ["clue_04"],
+    },
     relatedSuspects: [],
     relationships: [{ target: "clue_04", type: "related_to" }],
     importance: "high",
@@ -304,6 +397,7 @@ export const clues: Clue[] = [
           detail: "The door clue_08's fob access log later shows being used at 10:48 PM — visible but unused in this frame.",
         },
       ],
+      revealsClueIds: ["clue_05", "clue_06"],
     },
     timestamp: "9:40 PM",
     relatedSuspects: [],

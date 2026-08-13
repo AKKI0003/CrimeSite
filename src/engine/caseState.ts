@@ -49,6 +49,19 @@ export const useCaseStateStore = create<CaseStateShape>((set, get) => ({
       // loops until nothing new opens), which meant "Dig Deeper" on one card could
       // pop half the case file open at once. Investigation should cost one action
       // per clue: add exactly the clue that was found, nothing else.
+      //
+      // Also now self-gating: discoverClue() checks the clue's own unlocksAfter
+      // prerequisites and no-ops if they aren't all met yet. This makes it safe
+      // for activity/interrogation "revealsClueIds" payoffs to call discoverClue
+      // speculatively on an AND-gated clue (e.g. one that needs two different
+      // leads) without needing to duplicate the readiness check at every call
+      // site — whichever trigger fires last is the one that actually reveals it.
+      if (state.discoveredClueIds.has(clueId)) return state;
+      const clue = clues.find((c) => c.id === clueId);
+      if (clue?.unlocksAfter && clue.unlocksAfter.length > 0) {
+        const ready = clue.unlocksAfter.every((prereqId) => state.discoveredClueIds.has(prereqId));
+        if (!ready) return state;
+      }
       const next = new Set(state.discoveredClueIds);
       next.add(clueId);
       return { discoveredClueIds: next };

@@ -29,6 +29,11 @@ export interface InterrogationTopic {
   /** only offer this topic once a given clue has been discovered — optional gating,
    *  same pattern as Clue.unlocksAfter. Omit for always-available topics. */
   unlocksAfterClueId?: string;
+  /** clue ids to auto-discover the moment this topic is successfully asked
+   *  (an "answered" outcome, per interrogationEngine). Same no-op-if-not-
+   *  ready semantics as Clue activities — safe to list an AND-gated clue id
+   *  even if its other prerequisite hasn't landed yet. */
+  revealsClueIds?: string[];
 }
 
 export interface EvidenceReaction {
@@ -77,4 +82,8 @@ export interface Suspect {
   /** unlocked once the interrogation's pressure meter fills — the "crack in
    *  the story" moment. Optional; suspects without one just cap out calmly. */
   breakthroughResponse?: string;
+  /** clue ids to auto-discover the moment this suspect breaks (pressure
+   *  meter fills). Optional — a breakthrough doesn't have to hand over new
+   *  evidence, but often should. */
+  breakthroughRevealsClueIds?: string[];
 }

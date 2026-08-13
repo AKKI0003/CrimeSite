@@ -29,6 +29,7 @@ export const suspects: Suspect[] = [
         tone: "nervous",
         relatedClueIds: ["clue_06"],
         unlocksAfterClueId: "clue_06",
+        revealsClueIds: ["clue_07"],
       },
       {
         id: "rahul_topic_neha",
@@ -108,6 +109,7 @@ export const suspects: Suspect[] = [
         tone: "nervous",
         relatedClueIds: ["clue_04"],
         unlocksAfterClueId: "clue_04",
+        revealsClueIds: ["clue_14"],
       },
       {
         id: "tara_topic_friendship",
@@ -177,6 +179,7 @@ export const suspects: Suspect[] = [
         tone: "nervous",
         relatedClueIds: ["clue_01"],
         unlocksAfterClueId: "clue_01",
+        revealsClueIds: ["clue_08"],
       },
       {
         id: "vikram_topic_arjun",
@@ -187,6 +190,7 @@ export const suspects: Suspect[] = [
         tone: "defensive",
         relatedClueIds: ["clue_08"],
         unlocksAfterClueId: "clue_08",
+        revealsClueIds: ["clue_09"],
       },
     ],
     evidenceReactions: [
@@ -325,6 +329,7 @@ export const suspects: Suspect[] = [
         tone: "hostile",
         relatedClueIds: ["clue_10"],
         unlocksAfterClueId: "clue_10",
+        revealsClueIds: ["clue_11", "clue_13", "clue_09"],
       },
     ],
     evidenceReactions: [
