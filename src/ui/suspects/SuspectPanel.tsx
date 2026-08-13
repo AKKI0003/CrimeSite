@@ -2,6 +2,14 @@ import { useState } from "react";
 import { useCaseState } from "@/hooks/useCaseState";
 import type { Suspect } from "@/types";
 
+// Portrait art is Gemini-generated, Dev-A-owned asset content. Keyed by suspect
+// id rather than added to Suspect.photoUrl so this stays entirely inside ui/ —
+// Dev B's data/suspects.ts isn't touched. Fill in the rest as more portraits
+// are generated; suspects with no entry fall back to initials.
+const SUSPECT_PORTRAIT: Partial<Record<string, string>> = {
+  suspect_rahul: "/assets/portraits/suspect_rahul.jpg",
+};
+
 // Day 1: list view only. SuspectDetailModal (statement comparison UI) is a Day 2 build.
 export function SuspectPanel() {
   const { allSuspects } = useCaseState();
@@ -42,18 +50,30 @@ function SuspectRow({
     <li>
       <button
         onClick={onSelect}
-        className={`w-full rounded-[var(--radius-panel)] border px-3 py-2.5 text-left transition-colors ${
+        className={`w-full rounded-[var(--radius-panel)] border px-3 py-3 text-left transition-colors sm:py-2.5 ${
           selected
             ? "border-[var(--color-accent-red)] bg-[var(--color-bg-raised)]"
             : "border-[var(--color-border)] bg-[var(--color-bg)] hover:border-[var(--color-border-strong)]"
         }`}
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-panel)] font-[var(--font-display)] text-sm text-[var(--color-text-secondary)]">
-            {suspect.name
-              .split(" ")
-              .map((p) => p[0])
-              .join("")}
+          <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-[var(--color-border-strong)] bg-[var(--color-bg-panel)]">
+            {SUSPECT_PORTRAIT[suspect.id] ? (
+              <img
+                src={SUSPECT_PORTRAIT[suspect.id]}
+                alt=""
+                className="h-full w-full object-cover"
+                draggable={false}
+                loading="lazy"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center font-[var(--font-display)] text-sm text-[var(--color-text-secondary)]">
+                {suspect.name
+                  .split(" ")
+                  .map((p) => p[0])
+                  .join("")}
+              </div>
+            )}
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm text-[var(--color-text-primary)]">{suspect.name}</p>
