@@ -25,14 +25,66 @@ export interface Relationship {
   type: RelationshipType;
 }
 
+export type ActivityKind = "audio_call" | "document_compare" | "photo_examine" | "read";
+
+export interface AudioCallActivity {
+  kind: "audio_call";
+  /** label for the play control, e.g. "Recorded call — 9 days before" */
+  audioLabel: string;
+  /** the actual audio file path — Dev A wires this to a real <audio> element.
+   *  If no file exists yet, ui/ should render the transcript as a "waveform
+   *  scrub" the player has to click through line-by-line rather than just
+   *  printing it as paragraph text — the point is the player has to listen/
+   *  scrub, not skim. */
+  audioSrc?: string;
+  /** transcript lines, revealed progressively as the player plays/scrubs,
+   *  NOT dumped all at once under the clue title. */
+  transcriptLines: string[];
+}
+
+export interface DocumentCompareActivity {
+  kind: "document_compare";
+  /** what the player is being asked to compare this document against —
+   *  e.g. comparing an invoice's signature/date against another clue's.
+   *  ui/ should render both side by side and require the player to
+   *  actively flag the discrepancy rather than reading a conclusion. */
+  compareAgainstClueId: string;
+  /** the specific discrepancy the player should be able to find, kept out
+   *  of the clue description itself so it isn't just handed over — surfaced
+   *  by ui/ only after the player attempts the comparison. */
+  discrepancyHint: string;
+}
+
+export interface PhotoExamineActivity {
+  kind: "photo_examine";
+  imageSrc?: string;
+  /** hotspot regions worth a closer look, in % of image width/height, so
+   *  ui/ can render click-to-zoom points instead of one flat description */
+  hotspots: { x: number; y: number; label: string; detail: string }[];
+}
+
+export type ClueActivity =
+  | AudioCallActivity
+  | DocumentCompareActivity
+  | PhotoExamineActivity
+  | { kind: "read" };
+
 export interface Clue {
   id: string;
   category: EvidenceCategory;
   title: string;
   /** short text shown on the card face */
   summary: string;
-  /** full text shown when the card is opened/inspected */
+  /** full text shown when the card is opened/inspected. For non-"read"
+   *  activities, keep this to a short caption — the real content lives in
+   *  `activity`, not here, so the player has to do the activity instead of
+   *  just reading a paragraph. */
   description: string;
+  /** how the player engages with this clue. Defaults to "read" (the current
+   *  clue-card behavior) when omitted — set this explicitly on clues that
+   *  should be a call to listen to, a document to compare, or a photo to
+   *  examine, per the case design doc. */
+  activity?: ClueActivity;
   /** display timestamp, e.g. "10:56 PM" — optional, not every clue is time-anchored */
   timestamp?: string;
   relatedSuspects: string[];

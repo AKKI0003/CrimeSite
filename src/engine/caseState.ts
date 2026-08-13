@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { clues } from "@/data/clues";
 import type { Relationship } from "@/types";
-import { cascadeUnlocks } from "./clueUnlockEngine";
 
 export interface PlayerConnection {
   id: string;
@@ -45,11 +44,14 @@ export const useCaseStateStore = create<CaseStateShape>((set, get) => ({
 
   discoverClue: (clueId) =>
     set((state) => {
+      // Deliberately NOT cascading here. Discovering one clue used to fixed-point
+      // through the entire unlocksAfter graph in a single click (cascadeUnlocks
+      // loops until nothing new opens), which meant "Dig Deeper" on one card could
+      // pop half the case file open at once. Investigation should cost one action
+      // per clue: add exactly the clue that was found, nothing else.
       const next = new Set(state.discoveredClueIds);
       next.add(clueId);
-      // cascadeUnlocks handles chains: discovering this clue might satisfy the
-      // prerequisites for one or more gated clues, possibly in sequence.
-      return { discoveredClueIds: cascadeUnlocks(next) };
+      return { discoveredClueIds: next };
     }),
 
   isDiscovered: (clueId) => get().discoveredClueIds.has(clueId),

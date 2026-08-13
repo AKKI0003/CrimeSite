@@ -21,15 +21,9 @@ export const suspects: Suspect[] = [
     isActuallyResponsible: false,
     interrogationTopics: [
       {
-        id: "rahul_topic_alibi",
-        label: "Where were you that night?",
-        response:
-          "Home. I told you — home, alone, the whole night. I didn't even talk to her after nine.",
-        tone: "defensive",
-      },
-      {
         id: "rahul_topic_wifi",
         label: "Your Wi-Fi log says otherwise.",
+        keywords: ["wifi", "wi-fi", "router", "network", "home", "alone", "10:51", "left"],
         response:
           "...Fine. I left. Around eleven. But it's not what it looks like — I wasn't near her building, and I had nothing to do with whatever happened to her.",
         tone: "nervous",
@@ -39,13 +33,17 @@ export const suspects: Suspect[] = [
       {
         id: "rahul_topic_neha",
         label: "How was Neha, lately?",
+        keywords: ["neha", "lately", "acting", "behavior", "distracted", "secretive", "mood"],
         response:
           "Distracted. Secretive, honestly. She'd go quiet mid-conversation, like she was somewhere else in her head. I thought it was us. It wasn't about us.",
         tone: "calm",
+        relatedClueIds: ["clue_06"],
+        unlocksAfterClueId: "clue_06",
       },
       {
         id: "rahul_topic_driver",
         label: "A delivery driver placed a car near her building.",
+        keywords: ["driver", "delivery", "car", "sighting", "block", "seen", "11:10"],
         response:
           "I'm not going to answer that. Ask me something else.",
         tone: "hostile",
@@ -67,6 +65,8 @@ export const suspects: Suspect[] = [
       },
     ],
     defaultEvidenceReaction: "I don't see what that has to do with me.",
+    confusedResponse: "I don't— what are you even asking me?",
+    stonewallResponse: "I'm not talking about that until you've actually got something. Ask me something real.",
     breakthroughResponse:
       "Okay. Okay — I left to pick her up. She asked me to. She said she needed to disappear for a few days and I didn't ask why, I just drove. I've been protecting her plan this whole time, not myself.",
   },
@@ -90,15 +90,9 @@ export const suspects: Suspect[] = [
     isActuallyResponsible: false,
     interrogationTopics: [
       {
-        id: "tara_topic_alibi",
-        label: "Where were you that night?",
-        response:
-          "In my apartment. I don't really remember stepping out — it was a normal night, until it wasn't.",
-        tone: "calm",
-      },
-      {
         id: "tara_topic_fob",
         label: "Your fob log shows you left your floor at 11:38.",
+        keywords: ["fob", "access", "left", "floor", "apartment", "11:38", "out", "leave"],
         response:
           "You have a lot of logs for someone who thinks Neha's missing. Fine — I stepped out for a few minutes. It has nothing to do with her.",
         tone: "evasive",
@@ -108,6 +102,7 @@ export const suspects: Suspect[] = [
       {
         id: "tara_topic_mirroring",
         label: "Explain the phone-mirroring login.",
+        keywords: ["mirroring", "mirror", "login", "phone", "app", "session", "text", "11:42"],
         response:
           "I— that's private. It's not what you think it is. I'm not saying anything else without a lawyer in the room.",
         tone: "nervous",
@@ -117,9 +112,12 @@ export const suspects: Suspect[] = [
       {
         id: "tara_topic_friendship",
         label: "How well do you know Neha?",
+        keywords: ["friend", "friendship", "know", "close", "relationship", "downstairs"],
         response:
           "Better than anyone in this building. If something happened to her, I'd know. I'd feel it.",
         tone: "defensive",
+        relatedClueIds: ["clue_14"],
+        unlocksAfterClueId: "clue_14",
       },
     ],
     evidenceReactions: [
@@ -136,6 +134,8 @@ export const suspects: Suspect[] = [
       },
     ],
     defaultEvidenceReaction: "I'm not sure what you want me to say about that.",
+    confusedResponse: "I'm sorry, I don't follow what you're asking.",
+    stonewallResponse: "I don't know what you want me to say to a question like that. Come back when you've got something.",
     breakthroughResponse:
       "She came to me first. Before Rahul, before any of it. I ran the mirroring session so we could fake the 11:42 text — plant it, then let her actually leave at 10:55, clean. I did it because she asked, and because I believed her.",
   },
@@ -159,14 +159,9 @@ export const suspects: Suspect[] = [
     isActuallyResponsible: true,
     interrogationTopics: [
       {
-        id: "vikram_topic_generic",
-        label: "What happened that night?",
-        response: "I don't have anything to say about that night.",
-        tone: "hostile",
-      },
-      {
         id: "vikram_topic_fob",
         label: "Your fob placed you there for thirty minutes.",
+        keywords: ["fob", "access", "building", "entry", "thirty", "minutes", "10:48", "11:19"],
         response:
           "I was doing my job. That's the extent of what I'm prepared to say without counsel present.",
         tone: "evasive",
@@ -176,6 +171,7 @@ export const suspects: Suspect[] = [
       {
         id: "vikram_topic_door",
         label: "The lock damage report matches forced entry.",
+        keywords: ["door", "lock", "damage", "forced", "entry", "break"],
         response:
           "...I was sent to retrieve something. That's the truth. I never touched her, and I never saw her.",
         tone: "nervous",
@@ -185,9 +181,12 @@ export const suspects: Suspect[] = [
       {
         id: "vikram_topic_arjun",
         label: "Did Arjun Mehra send you there?",
+        keywords: ["arjun", "mehra", "orders", "send", "boss", "instructed", "instructions"],
         response:
           "I take instructions from corporate security leadership. I'm not going to elaborate further.",
         tone: "defensive",
+        relatedClueIds: ["clue_08"],
+        unlocksAfterClueId: "clue_08",
       },
     ],
     evidenceReactions: [
@@ -204,6 +203,8 @@ export const suspects: Suspect[] = [
       },
     ],
     defaultEvidenceReaction: "That's outside what I'm able to discuss.",
+    confusedResponse: "That's not a question I understand.",
+    stonewallResponse: "I'm not confirming or denying anything without something in front of me.",
     breakthroughResponse:
       "Fine. Arjun told me to search her apartment for whatever she'd taken from the servers — documents, drives, anything. I broke the lock, searched the place, found nothing, and left. I never touched her. I never saw her. That's the whole of it.",
   },
@@ -227,15 +228,9 @@ export const suspects: Suspect[] = [
     isActuallyResponsible: false,
     interrogationTopics: [
       {
-        id: "priya_topic_relationship",
-        label: "What was your relationship with Neha?",
-        response:
-          "She reported into finance for vendor reconciliation. Professional, mostly cordial. We disagreed near the end.",
-        tone: "calm",
-      },
-      {
         id: "priya_topic_invoices",
         label: "Your signature is on the Corebridge invoices.",
+        keywords: ["invoice", "invoices", "signature", "sign", "corebridge", "vendor"],
         response:
           "Neha and I disagreed about how to read some vendor numbers. That's all it was.",
         tone: "defensive",
@@ -245,6 +240,7 @@ export const suspects: Suspect[] = [
       {
         id: "priya_topic_call",
         label: "We have a recording of your call with her.",
+        keywords: ["call", "recording", "recorded", "phone call", "let it go", "picture"],
         response:
           "...I asked her to let it go until after the funding round closed. I'm not proud of that call. But I never went near her apartment.",
         tone: "nervous",
@@ -254,9 +250,12 @@ export const suspects: Suspect[] = [
       {
         id: "priya_topic_vikram",
         label: "Did you know about the break-in?",
+        keywords: ["vikram", "break-in", "break in", "know", "apartment", "search"],
         response:
           "No. God, no. If Vikram did something like that, that was Arjun's call, not mine.",
         tone: "evasive",
+        relatedClueIds: ["clue_08"],
+        unlocksAfterClueId: "clue_08",
       },
     ],
     evidenceReactions: [
@@ -273,6 +272,8 @@ export const suspects: Suspect[] = [
       },
     ],
     defaultEvidenceReaction: "I don't think that changes anything about what I've told you.",
+    confusedResponse: "I'm not sure what you're getting at.",
+    stonewallResponse: "I'd rather not speculate without you showing me what you actually have.",
     breakthroughResponse:
       "I signed off on inflated Corebridge invoices for over a year, to protect the round. Neha found it and wouldn't let it go. I asked her to sit on it. She wouldn't. That's the worst thing I did — I never went near her apartment, and I didn't know Vikram had.",
   },
@@ -296,15 +297,9 @@ export const suspects: Suspect[] = [
     isActuallyResponsible: true,
     interrogationTopics: [
       {
-        id: "arjun_topic_statement",
-        label: "Do you know what happened to Neha?",
-        response:
-          "This is a tragedy. Whatever the company can do to help find her, we will. I mean that.",
-        tone: "calm",
-      },
-      {
         id: "arjun_topic_deletion",
         label: "Someone wiped server logs the night she vanished.",
+        keywords: ["deletion", "delete", "server", "logs", "wiped", "files", "11:52"],
         response:
           "I authorized a routine data retention cleanup. If the timing looks bad, I understand that — but it had nothing to do with Neha personally.",
         tone: "defensive",
@@ -314,6 +309,7 @@ export const suspects: Suspect[] = [
       {
         id: "arjun_topic_vikram",
         label: "You sent Vikram into her apartment.",
+        keywords: ["vikram", "security", "sent", "apartment", "search", "authorize"],
         response:
           "I asked security to confirm whether she'd taken company materials. I did not authorize anyone to hurt her. I didn't think anyone would.",
         tone: "nervous",
@@ -323,6 +319,7 @@ export const suspects: Suspect[] = [
       {
         id: "arjun_topic_fraud",
         label: "The Corebridge invoices point to fraud.",
+        keywords: ["fraud", "corebridge", "invoices", "money", "40 crore", "vendor"],
         response:
           "I have nothing further to say about ongoing vendor matters without our counsel present.",
         tone: "hostile",
@@ -344,6 +341,8 @@ export const suspects: Suspect[] = [
       },
     ],
     defaultEvidenceReaction: "I'm not commenting on that without our counsel present.",
+    confusedResponse: "I don't think that's a fair question as phrased.",
+    stonewallResponse: "I'm not going to respond to that without documentation in front of me.",
     breakthroughResponse:
       "I sent Vikram to search her apartment for anything she'd copied off our servers before it reached a journalist. I was protecting the round, not covering up what happened to Neha — because I still don't know what happened to Neha. I want that on the record.",
   },
@@ -367,14 +366,9 @@ export const suspects: Suspect[] = [
     isActuallyResponsible: false,
     interrogationTopics: [
       {
-        id: "sameer_topic_rounds",
-        label: "Walk me through your rounds that night.",
-        response: "I did my usual rounds that night, nothing out of the ordinary.",
-        tone: "calm",
-      },
-      {
         id: "sameer_topic_log",
         label: "The guard log doesn't match the resident statements.",
+        keywords: ["log", "rounds", "guard", "resident", "match", "floor", "desk"],
         response:
           "Okay — look, that's personal, it's got nothing to do with the Kapoor case. Please don't put this in the report.",
         tone: "nervous",
@@ -384,9 +378,12 @@ export const suspects: Suspect[] = [
       {
         id: "sameer_topic_neha",
         label: "Did you see Neha leave that night?",
+        keywords: ["neha", "leave", "see", "saw", "exit", "night"],
         response:
           "Honestly? I wasn't at the desk the whole time. I can't swear to every minute.",
         tone: "evasive",
+        relatedClueIds: ["clue_15"],
+        unlocksAfterClueId: "clue_15",
       },
     ],
     evidenceReactions: [
@@ -398,6 +395,8 @@ export const suspects: Suspect[] = [
       },
     ],
     defaultEvidenceReaction: "I don't know what to tell you about that.",
+    confusedResponse: "Uh — I don't really get what you're asking.",
+    stonewallResponse: "Look, I'm not going to just volunteer stuff. Show me why you're asking.",
     breakthroughResponse:
       "It's embarrassing, not criminal. I let my girlfriend in through the side door, we sat in the break room for maybe forty minutes, and I backfilled the log so my supervisor wouldn't clock it. I never left the building unattended for more than a couple minutes, and I never saw anything happen to Neha.",
   },
