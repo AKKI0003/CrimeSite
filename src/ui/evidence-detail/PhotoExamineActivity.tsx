@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { PhotoExamineActivity as PhotoExamineActivityType } from "@/types";
 
 interface Props {
   activity: PhotoExamineActivityType;
+  discoverClue: (clueId: string) => void;
 }
 
 // No real photo assets yet for these clues (activity.imageSrc unset) — the
@@ -11,13 +12,24 @@ interface Props {
 // "this is footage/a photo", not just a text block) so the hotspots have
 // something to sit on. Swap in activity.imageSrc as a background-image
 // later without touching the hotspot logic below.
-export function PhotoExamineActivity({ activity }: Props) {
+export function PhotoExamineActivity({ activity, discoverClue }: Props) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [examined, setExamined] = useState<Set<number>>(new Set());
+  const revealedFired = useRef(false);
 
   function openHotspot(i: number) {
     setOpenIndex(i);
-    setExamined((prev) => new Set(prev).add(i));
+    setExamined((prev) => {
+      const next = new Set(prev).add(i);
+      // Fires the moment the LAST unexamined hotspot gets opened — not on
+      // any single click, per NOTE-for-Dev-A ("once every hotspot ... has
+      // been opened at least once").
+      if (next.size === activity.hotspots.length && !revealedFired.current) {
+        revealedFired.current = true;
+        (activity.revealsClueIds ?? []).forEach((id) => discoverClue(id));
+      }
+      return next;
+    });
   }
 
   return (

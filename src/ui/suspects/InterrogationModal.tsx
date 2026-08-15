@@ -37,7 +37,7 @@ const PRESSURE_TO_BREAK = 10;
  * replaces the script entirely.
  */
 export function InterrogationModal({ suspect, onClose }: InterrogationModalProps) {
-  const { isDiscovered, discoveredClues } = useCaseState();
+  const { isDiscovered, discoveredClues, discoverClue } = useCaseState();
   const [mode, setMode] = useState<"ask" | "present">("ask");
   const [activeLine, setActiveLine] = useState<{ id: string; text: string; tone?: string } | null>(null);
   const [typing, setTyping] = useState(false);
@@ -88,6 +88,10 @@ export function InterrogationModal({ suspect, onClose }: InterrogationModalProps
     setTyping(true);
     setAskedCount((n) => n + 1);
     setQuestion("");
+    // Only "answered" outcomes carry revealsClueIds (stonewalled/confused
+    // never do) — self-gating in discoverClue means we don't need to check
+    // that here either.
+    (resolved.revealsClueIds ?? []).forEach((id) => discoverClue(id));
   }
 
   function presentEvidence(clueId: string) {

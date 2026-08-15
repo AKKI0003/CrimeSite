@@ -8,13 +8,23 @@ interface Props {
   /** looked up by EvidenceInspector from the full clue list, since this
    *  component only knows the target id */
   compareClue: Clue | undefined;
+  discoverClue: (clueId: string) => void;
 }
 
 // Side-by-side documents; the discrepancy is deliberately NOT in either
 // clue's description — it only surfaces once the player actively flags it,
 // so "solving" this is a real (if small) act rather than a paragraph read.
-export function DocumentCompareActivity({ clue, activity, compareClue }: Props) {
+export function DocumentCompareActivity({ clue, activity, compareClue, discoverClue }: Props) {
   const [flagged, setFlagged] = useState(false);
+
+  function handleFlag() {
+    setFlagged(true);
+    // Per NOTE-for-Dev-A: this fires on the flag action specifically, not
+    // on merely opening the comparison — clue_11 has no revealsClueIds at
+    // all (its payoff is understanding for the player's own theory), so
+    // this is a no-op there and that's intentional.
+    (activity.revealsClueIds ?? []).forEach((id) => discoverClue(id));
+  }
 
   return (
     <div>
@@ -29,7 +39,7 @@ export function DocumentCompareActivity({ clue, activity, compareClue }: Props) 
 
       {!flagged ? (
         <button
-          onClick={() => setFlagged(true)}
+          onClick={handleFlag}
           className="mt-3 w-full rounded-sm border border-[var(--color-accent-amber)] bg-[var(--color-accent-amber)]/10 px-3 py-2 font-[var(--font-typewriter)] text-[11px] uppercase tracking-wide text-[var(--color-accent-amber)] transition-colors hover:bg-[var(--color-accent-amber)]/20"
         >
           Flag a discrepancy

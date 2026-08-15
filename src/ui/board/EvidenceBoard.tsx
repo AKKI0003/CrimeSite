@@ -27,12 +27,13 @@ const MAX_ZOOM = 1.75;
 // but is applied the same way (via the transform effect below) rather than
 // re-rendering the card list.
 export function EvidenceBoard() {
-  const { discoveredClues, allClues, allSuspects, boardPositions, connections, moveCard, addConnection, removeConnection } =
+  const { discoveredClues, allClues, allSuspects, boardPositions, connections, moveCard, addConnection, removeConnection, discoverClue } =
     useCaseState();
-  // NOTE: discoverClue is intentionally not called from anywhere in this file
-  // anymore — see NOTE-for-Dev-B.md #1. Reachable-but-undiscovered clues are
-  // only revealed once Dev B wires an activity-completion event to call it;
-  // that's not something the board should be triggering on a click/hold.
+  // discoverClue is passed straight through to EvidenceInspector, which
+  // hands it to each activity component — that's the only place it's
+  // actually called from now (see NOTE-for-Dev-A v3). It's self-gating
+  // (checks the target clue's own unlocksAfter), so nothing here needs to
+  // check readiness before passing it down.
   const { activeContradictions, hasFoundKeyContradiction } = useContradictions();
   const boardLeads = useBoardLeads();
   const wasContradictionFound = useRef(hasFoundKeyContradiction);
@@ -325,6 +326,7 @@ export function EvidenceBoard() {
         suspects={allSuspects}
         allClues={allClues}
         onClose={() => setOpenClueId(null)}
+        discoverClue={discoverClue}
       />
     </div>
   );

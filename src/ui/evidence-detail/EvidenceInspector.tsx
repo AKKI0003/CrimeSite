@@ -25,6 +25,7 @@ interface EvidenceInspectorProps {
   suspects: Suspect[];
   allClues: Clue[];
   onClose: () => void;
+  discoverClue: (clueId: string) => void;
 }
 
 // Day 2: full-text detail view for a clue, opened via EvidenceCard's
@@ -41,7 +42,7 @@ interface EvidenceInspectorProps {
 // deduction) and there's no more "Dig Deeper" button — new leads now surface
 // as a quiet pulsing card on the board itself (see useBoardLeads /
 // EvidenceBoard), not a CTA inside this modal.
-export function EvidenceInspector({ clue, suspects, allClues, onClose }: EvidenceInspectorProps) {
+export function EvidenceInspector({ clue, suspects, allClues, onClose, discoverClue }: EvidenceInspectorProps) {
   useEffect(() => {
     if (!clue) return;
     function onKey(e: KeyboardEvent) {
@@ -115,17 +116,18 @@ export function EvidenceInspector({ clue, suspects, allClues, onClose }: Evidenc
 
             <div className="mt-3">
               {activityKind === "audio_call" && clue.activity?.kind === "audio_call" && (
-                <AudioCallActivity activity={clue.activity} />
+                <AudioCallActivity activity={clue.activity} discoverClue={discoverClue} />
               )}
               {activityKind === "document_compare" && clue.activity?.kind === "document_compare" && (
                 <DocumentCompareActivity
                   clue={clue}
                   activity={clue.activity}
                   compareClue={allClues.find((c) => c.id === clue.activity!.compareAgainstClueId)}
+                  discoverClue={discoverClue}
                 />
               )}
               {activityKind === "photo_examine" && clue.activity?.kind === "photo_examine" && (
-                <PhotoExamineActivity activity={clue.activity} />
+                <PhotoExamineActivity activity={clue.activity} discoverClue={discoverClue} />
               )}
             </div>
 

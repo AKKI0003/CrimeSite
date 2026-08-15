@@ -5,6 +5,7 @@ import { playTypeTick } from "@/engine/audio";
 
 interface Props {
   activity: AudioCallActivityType;
+  discoverClue: (clueId: string) => void;
 }
 
 // No real audio files yet (activity.audioSrc is optional/unset for every
@@ -14,13 +15,24 @@ interface Props {
 // If activity.audioSrc is ever set, swap the interval below for real
 // <audio> timeupdate events keyed to line timestamps — the reveal mechanic
 // (revealedCount) doesn't need to change, just what drives it.
-export function AudioCallActivity({ activity }: Props) {
+export function AudioCallActivity({ activity, discoverClue }: Props) {
   const [revealedCount, setRevealedCount] = useState(0);
   const [playing, setPlaying] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const revealedFired = useRef(false);
 
   const total = activity.transcriptLines.length;
   const done = revealedCount >= total;
+
+  // Fires once, the moment the full call has actually been listened
+  // through — not on mount, not on scrub-preview. discoverClue() no-ops on
+  // its own if this clue's other prerequisites (AND-gates) aren't met yet,
+  // per NOTE-for-Dev-A, so no readiness check needed here.
+  useEffect(() => {
+    if (!done || revealedFired.current) return;
+    revealedFired.current = true;
+    (activity.revealsClueIds ?? []).forEach((id) => discoverClue(id));
+  }, [done, activity.revealsClueIds, discoverClue]);
 
   useEffect(() => {
     if (!playing) return;
